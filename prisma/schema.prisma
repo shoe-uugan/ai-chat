@@ -14,11 +14,13 @@ datasource db {
 }
 
 model Character {
-  id          String    @id @default(nanoid())
-  name        String
-  description String
-  image       String
-  messages    Message[]
+  id           String    @id @default(nanoid())
+  name         String
+  description  String
+  image        String
+  basePrompt   String
+  greetingText String
+  messages     Message[]
 }
 
 model Message {

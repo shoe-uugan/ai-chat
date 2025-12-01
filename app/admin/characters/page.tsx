@@ -13,6 +13,8 @@ interface Character {
   name: string;
   description: string;
   image: string;
+  basePrompt: string;
+  greetingText: string;
 }
 
 export default function AdminCharactersPage() {
@@ -20,6 +22,8 @@ export default function AdminCharactersPage() {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [editingCharacter, setEditingCharacter] = useState<Character | null>(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchCharacters();
@@ -34,6 +38,20 @@ export default function AdminCharactersPage() {
       console.error("Failed to fetch characters:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const deleteCharacter = async (id: string) => {
+    try {
+      const response = await fetch(`/api/character/${id}`, { method: "DELETE" });
+      if (response.ok) {
+        await fetchCharacters();
+      } else {
+        alert("Failed to delete character");
+      }
+    } catch (error) {
+      console.error("Failed to delete character:", error);
+      alert("Failed to delete character");
     }
   };
 
@@ -62,9 +80,11 @@ export default function AdminCharactersPage() {
       const formData = new FormData(event.currentTarget);
       const name = formData.get("name") as string;
       const description = formData.get("description") as string;
+      const basePrompt = formData.get("basePrompt") as string;
+      const greetingText = formData.get("greetingText") as string;
       const imageFile = formData.get("image") as File;
 
-      if (!name || !description || !imageFile) {
+      if (!name || !description || !basePrompt || !greetingText || !imageFile) {
         alert("All fields are required");
         return;
       }
@@ -82,6 +102,8 @@ export default function AdminCharactersPage() {
           name,
           description,
           image: imageUrl,
+          basePrompt,
+          greetingText,
         }),
       });
 
@@ -95,6 +117,55 @@ export default function AdminCharactersPage() {
     } catch (error) {
       console.error("Failed to create character:", error);
       alert("Failed to create character");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const onSubmitEdit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setUploading(true);
+
+    try {
+      const formData = new FormData(event.currentTarget);
+      const name = formData.get("name") as string;
+      const description = formData.get("description") as string;
+      const basePrompt = formData.get("basePrompt") as string;
+      const greetingText = formData.get("greetingText") as string;
+      const imageFile = formData.get("image") as File;
+
+      let imageUrl = editingCharacter!.image;
+
+      if (imageFile && imageFile.size > 0) {
+        // Upload new image
+        imageUrl = await uploadImage(imageFile);
+      }
+
+      // Update character
+      const response = await fetch(`/api/character/${editingCharacter!.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          description,
+          image: imageUrl,
+          basePrompt,
+          greetingText,
+        }),
+      });
+
+      if (response.ok) {
+        await fetchCharacters();
+        setEditDialogOpen(false);
+        setEditingCharacter(null);
+      } else {
+        alert("Failed to update character");
+      }
+    } catch (error) {
+      console.error("Failed to update character:", error);
+      alert("Failed to update character");
     } finally {
       setUploading(false);
     }
@@ -127,6 +198,14 @@ export default function AdminCharactersPage() {
                 <Input id="description" name="description" required />
               </div>
               <div>
+                <Label htmlFor="basePrompt">Base Prompt</Label>
+                <textarea id="basePrompt" name="basePrompt" required className="w-full p-2 border rounded" rows={4} />
+              </div>
+              <div>
+                <Label htmlFor="greetingText">Greeting Text</Label>
+                <textarea id="greetingText" name="greetingText" required className="w-full p-2 border rounded" rows={4} />
+              </div>
+              <div>
                 <Label htmlFor="image">Image</Label>
                 <Input id="image" name="image" type="file" accept="image/*" required />
               </div>
@@ -136,25 +215,98 @@ export default function AdminCharactersPage() {
             </form>
           </DialogContent>
         </Dialog>
+        <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Character</DialogTitle>
+              <DialogDescription>Update the character details.</DialogDescription>
+            </DialogHeader>
+            <form onSubmit={onSubmitEdit} className="space-y-4">
+              <div>
+                <Label htmlFor="edit-name">Name</Label>
+                <Input id="edit-name" name="name" defaultValue={editingCharacter?.name} required />
+              </div>
+              <div>
+                <Label htmlFor="edit-description">Description</Label>
+                <Input id="edit-description" name="description" defaultValue={editingCharacter?.description} required />
+              </div>
+              <div>
+                <Label htmlFor="edit-basePrompt">Base Prompt</Label>
+                <textarea
+                  id="edit-basePrompt"
+                  name="basePrompt"
+                  defaultValue={editingCharacter?.basePrompt}
+                  required
+                  className="w-full p-2 border rounded"
+                  rows={4}
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-greetingText">Greeting Text</Label>
+                <textarea
+                  id="edit-greetingText"
+                  name="greetingText"
+                  defaultValue={editingCharacter?.greetingText}
+                  required
+                  className="w-full p-2 border rounded"
+                  rows={4}
+                />
+              </div>
+              <div>
+                <Label>Current Image</Label>
+                {editingCharacter && (
+                  <Image src={editingCharacter.image} alt={editingCharacter.name} width={100} height={100} className="object-cover rounded" />
+                )}
+              </div>
+              <div>
+                <Label htmlFor="edit-image">New Image (optional)</Label>
+                <Input id="edit-image" name="image" type="file" accept="image/*" />
+              </div>
+              <Button type="submit" disabled={uploading}>
+                {uploading ? "Updating..." : "Update"}
+              </Button>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>ID</TableHead>
+            <TableHead>Image</TableHead>
             <TableHead>Name</TableHead>
             <TableHead>Description</TableHead>
-            <TableHead>Image</TableHead>
+            <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {characters.map((character) => (
             <TableRow key={character.id}>
-              <TableCell>{character.id}</TableCell>
+              <TableCell>
+                <Image src={character.image} alt={character.name} width={50} height={50} className="object-cover rounded" />
+              </TableCell>
               <TableCell>{character.name}</TableCell>
               <TableCell>{character.description}</TableCell>
               <TableCell>
-                <Image src={character.image} alt={character.name} width={50} height={50} className="object-cover rounded" />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setEditingCharacter(character);
+                    setEditDialogOpen(true);
+                  }}
+                >
+                  Edit
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => {
+                    if (window.confirm("Are you sure you want to delete this character?")) deleteCharacter(character.id);
+                  }}
+                >
+                  Delete
+                </Button>
               </TableCell>
             </TableRow>
           ))}
