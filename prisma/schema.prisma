@@ -26,6 +26,7 @@ model Character {
 model Message {
   id          String    @id @default(nanoid())
   content     String
+  role        String // 'model' , 'user'
   character   Character @relation(fields: [characterId], references: [id])
   characterId String
   createdAt   DateTime  @default(now())
