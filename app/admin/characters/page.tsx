@@ -1,9 +1,24 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useRouter } from "next/navigation";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
@@ -18,11 +33,14 @@ interface Character {
 }
 
 export default function AdminCharactersPage() {
+  const router = useRouter();
   const [characters, setCharacters] = useState<Character[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [editingCharacter, setEditingCharacter] = useState<Character | null>(null);
+  const [editingCharacter, setEditingCharacter] = useState<Character | null>(
+    null
+  );
   const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   useEffect(() => {
@@ -43,7 +61,9 @@ export default function AdminCharactersPage() {
 
   const deleteCharacter = async (id: string) => {
     try {
-      const response = await fetch(`/api/character/${id}`, { method: "DELETE" });
+      const response = await fetch(`/api/character/${id}`, {
+        method: "DELETE",
+      });
       if (response.ok) {
         await fetchCharacters();
       } else {
@@ -186,7 +206,9 @@ export default function AdminCharactersPage() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Create New Character</DialogTitle>
-              <DialogDescription>Add a new character to the system.</DialogDescription>
+              <DialogDescription>
+                Add a new character to the system.
+              </DialogDescription>
             </DialogHeader>
             <form onSubmit={onSubmit} className="space-y-4">
               <div>
@@ -199,15 +221,33 @@ export default function AdminCharactersPage() {
               </div>
               <div>
                 <Label htmlFor="basePrompt">Base Prompt</Label>
-                <textarea id="basePrompt" name="basePrompt" required className="w-full p-2 border rounded" rows={4} />
+                <textarea
+                  id="basePrompt"
+                  name="basePrompt"
+                  required
+                  className="w-full p-2 border rounded"
+                  rows={4}
+                />
               </div>
               <div>
                 <Label htmlFor="greetingText">Greeting Text</Label>
-                <textarea id="greetingText" name="greetingText" required className="w-full p-2 border rounded" rows={4} />
+                <textarea
+                  id="greetingText"
+                  name="greetingText"
+                  required
+                  className="w-full p-2 border rounded"
+                  rows={4}
+                />
               </div>
               <div>
                 <Label htmlFor="image">Image</Label>
-                <Input id="image" name="image" type="file" accept="image/*" required />
+                <Input
+                  id="image"
+                  name="image"
+                  type="file"
+                  accept="image/*"
+                  required
+                />
               </div>
               <Button type="submit" disabled={uploading}>
                 {uploading ? "Creating..." : "Create"}
@@ -219,16 +259,28 @@ export default function AdminCharactersPage() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Edit Character</DialogTitle>
-              <DialogDescription>Update the character details.</DialogDescription>
+              <DialogDescription>
+                Update the character details.
+              </DialogDescription>
             </DialogHeader>
             <form onSubmit={onSubmitEdit} className="space-y-4">
               <div>
                 <Label htmlFor="edit-name">Name</Label>
-                <Input id="edit-name" name="name" defaultValue={editingCharacter?.name} required />
+                <Input
+                  id="edit-name"
+                  name="name"
+                  defaultValue={editingCharacter?.name}
+                  required
+                />
               </div>
               <div>
                 <Label htmlFor="edit-description">Description</Label>
-                <Input id="edit-description" name="description" defaultValue={editingCharacter?.description} required />
+                <Input
+                  id="edit-description"
+                  name="description"
+                  defaultValue={editingCharacter?.description}
+                  required
+                />
               </div>
               <div>
                 <Label htmlFor="edit-basePrompt">Base Prompt</Label>
@@ -255,12 +307,23 @@ export default function AdminCharactersPage() {
               <div>
                 <Label>Current Image</Label>
                 {editingCharacter && (
-                  <Image src={editingCharacter.image} alt={editingCharacter.name} width={100} height={100} className="object-cover rounded" />
+                  <Image
+                    src={editingCharacter.image}
+                    alt={editingCharacter.name}
+                    width={100}
+                    height={100}
+                    className="object-cover rounded"
+                  />
                 )}
               </div>
               <div>
                 <Label htmlFor="edit-image">New Image (optional)</Label>
-                <Input id="edit-image" name="image" type="file" accept="image/*" />
+                <Input
+                  id="edit-image"
+                  name="image"
+                  type="file"
+                  accept="image/*"
+                />
               </div>
               <Button type="submit" disabled={uploading}>
                 {uploading ? "Updating..." : "Update"}
@@ -283,11 +346,24 @@ export default function AdminCharactersPage() {
           {characters.map((character) => (
             <TableRow key={character.id}>
               <TableCell>
-                <Image src={character.image} alt={character.name} width={50} height={50} className="object-cover rounded" />
+                <Image
+                  src={character.image}
+                  alt={character.name}
+                  width={50}
+                  height={50}
+                  className="object-cover rounded"
+                />
               </TableCell>
               <TableCell>{character.name}</TableCell>
               <TableCell>{character.description}</TableCell>
               <TableCell>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => router.push(`/?characterId=${character.id}`)}
+                >
+                  Chat
+                </Button>
                 <Button
                   variant="outline"
                   size="sm"
@@ -302,7 +378,12 @@ export default function AdminCharactersPage() {
                   variant="destructive"
                   size="sm"
                   onClick={() => {
-                    if (window.confirm("Are you sure you want to delete this character?")) deleteCharacter(character.id);
+                    if (
+                      window.confirm(
+                        "Are you sure you want to delete this character?"
+                      )
+                    )
+                      deleteCharacter(character.id);
                   }}
                 >
                   Delete
