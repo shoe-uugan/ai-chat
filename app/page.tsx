@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import Image from "next/image";
@@ -23,7 +23,7 @@ interface Message {
   createdAt: string;
 }
 
-export default function ChatroomPage() {
+function ChatroomContent() {
   const { data: session, status } = useSession();
   const [characters, setCharacters] = useState<Character[]>([]);
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
@@ -199,6 +199,17 @@ export default function ChatroomPage() {
       </div>
     );
   }
+
+  export default function ChatroomPage() {
+    return (
+      <Suspense
+        fallback={<div className="container mx-auto py-8">Loading...</div>}
+      >
+        <ChatroomContent />
+      </Suspense>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-800 via-grey-900 to-slate-800 flex flex-col">
       <div className="shadow-2xl px-6 py-4 bg-black/20 backdrop-blur-sm flex justify-between items-center border-b border-white/10">
