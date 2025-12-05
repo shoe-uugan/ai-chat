@@ -1,4 +1,3 @@
-import { Prisma } from "@/app/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { Chat, GoogleGenAI } from "@google/genai";
@@ -45,7 +44,7 @@ export const POST = async (
 
   const { characterId } = await params;
   const { content } = await req.json();
-  const userId = (session.user as any).id;
+  const userId = session.user.id;
 
   const character = await prisma.character.findUnique({
     where: { id: characterId },

@@ -2,14 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -22,6 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
+import { MessageCircle, Edit, Trash2, Plus } from "lucide-react";
 
 interface Character {
   id: string;
@@ -196,203 +189,259 @@ export default function AdminCharactersPage() {
   }
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Admin - Characters</h1>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>Create Character</Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Create New Character</DialogTitle>
-              <DialogDescription>
-                Add a new character to the system.
-              </DialogDescription>
-            </DialogHeader>
-            <form onSubmit={onSubmit} className="space-y-4">
-              <div>
-                <Label htmlFor="name">Name</Label>
-                <Input id="name" name="name" required />
-              </div>
-              <div>
-                <Label htmlFor="description">Description</Label>
-                <Input id="description" name="description" required />
-              </div>
-              <div>
-                <Label htmlFor="basePrompt">Base Prompt</Label>
-                <textarea
-                  id="basePrompt"
-                  name="basePrompt"
-                  required
-                  className="w-full p-2 border rounded"
-                  rows={4}
-                />
-              </div>
-              <div>
-                <Label htmlFor="greetingText">Greeting Text</Label>
-                <textarea
-                  id="greetingText"
-                  name="greetingText"
-                  required
-                  className="w-full p-2 border rounded"
-                  rows={4}
-                />
-              </div>
-              <div>
-                <Label htmlFor="image">Image</Label>
-                <Input
-                  id="image"
-                  name="image"
-                  type="file"
-                  accept="image/*"
-                  required
-                />
-              </div>
-              <Button type="submit" disabled={uploading}>
-                {uploading ? "Creating..." : "Create"}
+    <>
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-white bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
+            Admin - Characters
+          </h1>
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white font-semibold px-4 py-2 rounded-lg shadow-lg transition-all duration-300 flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                Create
               </Button>
-            </form>
-          </DialogContent>
-        </Dialog>
-        <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Edit Character</DialogTitle>
-              <DialogDescription>
-                Update the character details.
-              </DialogDescription>
-            </DialogHeader>
-            <form onSubmit={onSubmitEdit} className="space-y-4">
-              <div>
-                <Label htmlFor="edit-name">Name</Label>
-                <Input
-                  id="edit-name"
-                  name="name"
-                  defaultValue={editingCharacter?.name}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="edit-description">Description</Label>
-                <Input
-                  id="edit-description"
-                  name="description"
-                  defaultValue={editingCharacter?.description}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="edit-basePrompt">Base Prompt</Label>
-                <textarea
-                  id="edit-basePrompt"
-                  name="basePrompt"
-                  defaultValue={editingCharacter?.basePrompt}
-                  required
-                  className="w-full p-2 border rounded"
-                  rows={4}
-                />
-              </div>
-              <div>
-                <Label htmlFor="edit-greetingText">Greeting Text</Label>
-                <textarea
-                  id="edit-greetingText"
-                  name="greetingText"
-                  defaultValue={editingCharacter?.greetingText}
-                  required
-                  className="w-full p-2 border rounded"
-                  rows={4}
-                />
-              </div>
-              <div>
-                <Label>Current Image</Label>
-                {editingCharacter && (
-                  <Image
-                    src={editingCharacter.image}
-                    alt={editingCharacter.name}
-                    width={100}
-                    height={100}
-                    className="object-cover rounded"
+            </DialogTrigger>
+            <DialogContent className="bg-gray-800 border-gray-700">
+              <DialogHeader>
+                <DialogTitle className="text-white">
+                  Create New Character
+                </DialogTitle>
+                <DialogDescription className="text-gray-300">
+                  Add a new character to the system.
+                </DialogDescription>
+              </DialogHeader>
+              <form onSubmit={onSubmit} className="space-y-4">
+                <div>
+                  <Label htmlFor="name" className="text-white">
+                    Name
+                  </Label>
+                  <Input
+                    id="name"
+                    name="name"
+                    required
+                    className="bg-gray-700 border-gray-600 text-white"
                   />
-                )}
-              </div>
-              <div>
-                <Label htmlFor="edit-image">New Image (optional)</Label>
-                <Input
-                  id="edit-image"
-                  name="image"
-                  type="file"
-                  accept="image/*"
-                />
-              </div>
-              <Button type="submit" disabled={uploading}>
-                {uploading ? "Updating..." : "Update"}
-              </Button>
-            </form>
-          </DialogContent>
-        </Dialog>
-      </div>
+                </div>
+                <div>
+                  <Label htmlFor="description" className="text-white">
+                    Description
+                  </Label>
+                  <Input
+                    id="description"
+                    name="description"
+                    required
+                    className="bg-gray-700 border-gray-600 text-white"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="basePrompt" className="text-white">
+                    Base Prompt
+                  </Label>
+                  <textarea
+                    id="basePrompt"
+                    name="basePrompt"
+                    required
+                    className="w-full p-2 border border-gray-600 rounded bg-gray-700 text-white"
+                    rows={4}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="greetingText" className="text-white">
+                    Greeting Text
+                  </Label>
+                  <textarea
+                    id="greetingText"
+                    name="greetingText"
+                    required
+                    className="w-full p-2 border border-gray-600 rounded bg-gray-700 text-white"
+                    rows={4}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="image" className="text-white">
+                    Image
+                  </Label>
+                  <Input
+                    id="image"
+                    name="image"
+                    type="file"
+                    accept="image/*"
+                    required
+                    className="bg-gray-700 border-gray-600 text-white"
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  disabled={uploading}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  {uploading ? "Creating..." : "Create"}
+                </Button>
+              </form>
+            </DialogContent>
+          </Dialog>
+          <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+            <DialogContent className="bg-gray-800 border-gray-700">
+              <DialogHeader>
+                <DialogTitle className="text-white">Edit Character</DialogTitle>
+                <DialogDescription className="text-gray-300">
+                  Update the character details.
+                </DialogDescription>
+              </DialogHeader>
+              <form onSubmit={onSubmitEdit} className="space-y-4">
+                <div>
+                  <Label htmlFor="edit-name" className="text-white">
+                    Name
+                  </Label>
+                  <Input
+                    id="edit-name"
+                    name="name"
+                    defaultValue={editingCharacter?.name}
+                    required
+                    className="bg-gray-700 border-gray-600 text-white"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="edit-description" className="text-white">
+                    Description
+                  </Label>
+                  <Input
+                    id="edit-description"
+                    name="description"
+                    defaultValue={editingCharacter?.description}
+                    required
+                    className="bg-gray-700 border-gray-600 text-white"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="edit-basePrompt" className="text-white">
+                    Base Prompt
+                  </Label>
+                  <textarea
+                    id="edit-basePrompt"
+                    name="basePrompt"
+                    defaultValue={editingCharacter?.basePrompt}
+                    required
+                    className="w-full p-2 border border-gray-600 rounded bg-gray-700 text-white"
+                    rows={4}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="edit-greetingText" className="text-white">
+                    Greeting Text
+                  </Label>
+                  <textarea
+                    id="edit-greetingText"
+                    name="greetingText"
+                    defaultValue={editingCharacter?.greetingText}
+                    required
+                    className="w-full p-2 border border-gray-600 rounded bg-gray-700 text-white"
+                    rows={4}
+                  />
+                </div>
+                <div>
+                  <Label className="text-white">Current Image</Label>
+                  {editingCharacter && (
+                    <Image
+                      src={editingCharacter.image}
+                      alt={editingCharacter.name}
+                      width={100}
+                      height={100}
+                      className="object-cover rounded mt-2"
+                    />
+                  )}
+                </div>
+                <div>
+                  <Label htmlFor="edit-image" className="text-white">
+                    New Image (optional)
+                  </Label>
+                  <Input
+                    id="edit-image"
+                    name="image"
+                    type="file"
+                    accept="image/*"
+                    className="bg-gray-700 border-gray-600 text-white"
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  disabled={uploading}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  {uploading ? "Updating..." : "Update"}
+                </Button>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Image</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Description</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {characters.map((character) => (
-            <TableRow key={character.id}>
-              <TableCell>
+            <div
+              key={character.id}
+              className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-700 overflow-hidden"
+            >
+              <div className="h-48 flex items-center justify-center bg-gray-700 overflow-hidden">
                 <Image
                   src={character.image}
                   alt={character.name}
-                  width={50}
-                  height={50}
-                  className="object-cover rounded"
+                  width={400}
+                  height={192}
+                  className="max-w-full max-h-full object-contain"
                 />
-              </TableCell>
-              <TableCell>{character.name}</TableCell>
-              <TableCell>{character.description}</TableCell>
-              <TableCell>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => router.push(`/?characterId=${character.id}`)}
-                >
-                  Chat
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setEditingCharacter(character);
-                    setEditDialogOpen(true);
-                  }}
-                >
-                  Edit
-                </Button>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => {
-                    if (
-                      window.confirm(
-                        "Are you sure you want to delete this character?"
+              </div>
+              <div className="p-4">
+                <h3 className="text-xl font-bold text-white mb-2">
+                  {character.name}
+                </h3>
+                <p className="text-gray-300 text-sm mb-4 line-clamp-3">
+                  {character.description.length > 100
+                    ? `${character.description.substring(0, 100)}...`
+                    : character.description}
+                </p>
+                <div className="flex gap-2 flex-wrap">
+                  <Button
+                    size="sm"
+                    onClick={() => router.push(`/?characterId=${character.id}`)}
+                    className="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-1 rounded-md transition-colors duration-200 flex items-center gap-1"
+                  >
+                    <MessageCircle className="h-3 w-3" />
+                    Chat
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      setEditingCharacter(character);
+                      setEditDialogOpen(true);
+                    }}
+                    className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded-md transition-colors duration-200 flex items-center gap-1"
+                  >
+                    <Edit className="h-3 w-3" />
+                    Edit
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => {
+                      if (
+                        window.confirm(
+                          "Are you sure you want to delete this character?"
+                        )
                       )
-                    )
-                      deleteCharacter(character.id);
-                  }}
-                >
-                  Delete
-                </Button>
-              </TableCell>
-            </TableRow>
+                        deleteCharacter(character.id);
+                    }}
+                    className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1 rounded-md transition-colors duration-200 flex items-center gap-1"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                    Delete
+                  </Button>
+                </div>
+              </div>
+            </div>
           ))}
-        </TableBody>
-      </Table>
-    </div>
+        </div>
+      </div>
+    </>
   );
 }
